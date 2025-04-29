@@ -7,18 +7,22 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-yarn-dependencies-{{ checksum "yarn.lock" }}
+            - v1-yarn-dependencies-{{ checksum "batmobile/yarn.lock" }}
             - v1-yarn-dependencies-
       - run:
           name: Install Dependencies
-          command: yarn install
+          command: |
+            cd batmobile
+            yarn install
       - save_cache:
           paths:
-            - node_modules
-          key: v1-yarn-dependencies-{{ checksum "yarn.lock" }}
+            - batmobile/node_modules
+          key: v1-yarn-dependencies-{{ checksum "batmobile/yarn.lock" }}
       - run:
           name: Run Tests
-          command: yarn test
+          command: |
+            cd batmobile
+            yarn test
 workflows:
   version: 2
   build_and_test:
