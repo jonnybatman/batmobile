@@ -1,47 +1,26 @@
 version: 2.1
-executors:
-  node-executor:
-    docker:
-      - image: cimg/node:lts
-    working_directory: ~/project
 jobs:
   build:
-    executor: node-executor
+    docker:
+      - image: cimg/node:14.17
     steps:
       - checkout
       - restore_cache:
           keys:
-            - yarn-cache-{{ checksum "yarn.lock" }}
-            - yarn-cache-
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
       - run:
-          name: Install dependencies
-          command: yarn install
+          name: Install Dependencies
+          command: npm install
       - save_cache:
           paths:
-            - ~/.cache/yarn
-          key: yarn-cache-{{ checksum "yarn.lock" }}
+            - node_modules
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
       - run:
-          name: Build the project
-          command: yarn build
-  test:
-    executor: node-executor
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - yarn-cache-{{ checksum "yarn.lock" }}
-            - yarn-cache-
-      - run:
-          name: Install dependencies
-          command: yarn install
-      - run:
-          name: Run tests
-          command: yarn test
+          name: Run Tests
+          command: npm test
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build
-      - test:
-          requires:
-            - build
